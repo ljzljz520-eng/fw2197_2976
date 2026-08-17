@@ -40,13 +40,16 @@ func (s *ProjectService) PublishProject(id, reviewer string) (domain.AssessmentP
 	if err != nil {
 		return domain.AssessmentProject{}, err
 	}
+	if !project.CanTransition(domain.ProjectPublished) {
+		return domain.AssessmentProject{}, domain.ErrInvalidTransition
+	}
 	if strings.TrimSpace(reviewer) == "" {
 		return domain.AssessmentProject{}, errors.New("reviewer is required")
 	}
 	project.Audit.ReviewedBy = append(project.Audit.ReviewedBy, reviewer)
-	project.Status = domain.ProjectPublished
-	project.Version++
-	project.Audit.Events = append(project.Audit.Events, "PUBLISHED")
+	if err := project.Transition(domain.ProjectPublished); err != nil {
+		return domain.AssessmentProject{}, err
+	}
 	if err := s.projects.Save(project); err != nil {
 		return domain.AssessmentProject{}, err
 	}
