@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "metrics": {
+    "production_loc": 2303,
+    "production_files": 39,
+    "production_packages": 7,
+    "test_files": 9,
+    "production_functions": 161,
+    "decision_points": 326
+  },
+  "persistence": {
+    "module": "go.etcd.io/bbolt",
+    "entities": [
+      "Learner",
+      "AssessmentProject",
+      "Certification",
+      "AuditTrail"
+    ],
+    "reopen_test": "TestPersistenceSurvivesReopen"
+  },
+  "workflows": [
+    {
+      "steps": [
+        "register an assessment project",
+        "validate and add learner records",
+        "persist the registration in bbolt",
+        "verify the registration result"
+      ],
+      "test": "TestWorkflowRegistration"
+    },
+    {
+      "steps": [
+        "review a registered assessment",
+        "publish the assessment project",
+        "archive the published project",
+        "attempt a guarded republish"
+      ],
+      "test": "TestWorkflowPublication"
+    },
+    {
+      "steps": [
+        "register scored learners",
+        "calculate overall scores",
+        "export learner certification rows",
+        "export aggregate score summary"
+      ],
+      "test": "TestWorkflowExport"
+    }
+  ]
+}
